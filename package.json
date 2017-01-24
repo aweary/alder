@@ -1,6 +1,6 @@
 {
   "name": "@aweary/alder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "tree.js",
   "repository": {
     "type": "git",
