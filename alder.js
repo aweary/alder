@@ -10,6 +10,7 @@ const program = require('commander')
 program.version('1.0.0')
   .arguments('[target]')
   .option('-i, --no-indent', 'Tree will not print the indentation lines', { isDefault: true })
+  .option('-f, --full', 'Print the full path prefix for each file')
   .option('-s, --sizes', 'Show file sizes in tree')
   .option('-e, --exclude <s>', 'Exclude files matching a pattern')
   .option('-in, --include <s>', 'Include only files that match a pattern')
@@ -29,6 +30,7 @@ const cwd = process.env.PWD;
 const root = path.resolve(cwd, input)
 const maxDepth = program.depth || Infinity 
 const showSize = program.sizes
+const showFullPath = !!program.full
 const shouldIndent =  typeof program.indent === 'undefined' ? true : program.indent
 const hasExcludePattern = typeof program.exclude !== 'undefined'
 const hasIncludePattern = typeof program.include !== 'undefined'
@@ -118,7 +120,7 @@ function buildTree(directory, depth) {
       continue
     }
 
-    const filename = color(file)
+    const filename = showFullPath ? color(fullPath) : color(file)
     output += prefix + filename + (!isDirectory && showSize ? ` (${size})` : '') + '\n';
     if (isDirectory && (depth + 1 < maxDepth)) {
       buildTree(path.resolve(directory, file), depth + 1)
