@@ -27,7 +27,7 @@ yarn global add @aweary/alder
 
 ### Exclude pattern
 
-You can pass either a string or a regular expression to `--exclude`:
+You can pass either a string or a regular expression as string to `--exclude`:
 
 ```sh
 # excluding single directory
@@ -39,7 +39,7 @@ alder --exclude=".git|bower_components|node_modules"
 
 ### Include pattern
 
-You can pass either a string or a regular expression to `--include`:
+You can pass either a string or a regular expression as string to `--include`:
 
 ```sh
 # excluding single directory
