@@ -33,7 +33,7 @@ You can pass either a string or a regular expression as string to `--exclude`:
 # excluding single directory
 alder --exclude=.git
 
-# excluding multiple directory
+# excluding multiple directories
 alder --exclude=".git|bower_components|node_modules"
 ```
 
@@ -42,9 +42,9 @@ alder --exclude=".git|bower_components|node_modules"
 You can pass either a string or a regular expression as string to `--include`:
 
 ```sh
-# excluding single directory
+# including single file pattern
 alder --include=package
 
-# excluding multiple directory
+# including multiple files patterns
 alder --include="package|webpack"
 ```
