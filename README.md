@@ -1,4 +1,4 @@
-# `arbor` 🌳
+# alder 🌳
  A recursive directory listing program that supports file-size reporting, and pattern matching. Inspired by the [`tree`](http://www.computerhope.com/unix/tree.htm)
 UNIX command.
 
