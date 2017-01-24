@@ -24,3 +24,27 @@ yarn global add @aweary/alder
     -i, --include <s>  Include only files that match a pattern
     -d, --depth <n>    Only render the tree to a specific depth
 ```
+
+### Exclude pattern
+
+You can pass either a string or a regular expression to `--exclude`:
+
+```sh
+# excluding single directory
+alder --exclude=.git
+
+# excluding multiple directory
+alder --exclude=".git|bower_components|node_modules"
+```
+
+### Include pattern
+
+You can pass either a string or a regular expression to `--include`:
+
+```sh
+# excluding single directory
+alder --include=package
+
+# excluding multiple directory
+alder --include="package|webpack"
+```
