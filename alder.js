@@ -9,9 +9,10 @@ const program = require('commander')
 
 program.version('1.0.0')
   .arguments('[target]')
+  .option('-i, --no-indent', 'Tree will not print the indentation lines', { isDefault: true })
   .option('-s, --sizes', 'Show file sizes in tree')
   .option('-e, --exclude <s>', 'Exclude files matching a pattern')
-  .option('-i, --include <s>', 'Include only files that match a pattern')
+  .option('-in, --include <s>', 'Include only files that match a pattern')
   .option('-d, --depth <n>', 'Only render the tree to a specific depth', parseInt)
   .parse(process.argv)
 
@@ -28,6 +29,7 @@ const cwd = process.env.PWD;
 const root = path.resolve(cwd, input)
 const maxDepth = program.depth || Infinity 
 const showSize = program.sizes
+const shouldIndent =  typeof program.indent === 'undefined' ? true : program.indent
 const hasExcludePattern = typeof program.exclude !== 'undefined'
 const hasIncludePattern = typeof program.include !== 'undefined'
 const excludePattern = new RegExp(program.exclude)
@@ -57,6 +59,9 @@ let totalFileSize = 0
  * @param {Boolean} bottom  whether this is the last file in the folder
  */
 function buildPrefix(depth, bottom) {
+  if (!shouldIndent) {
+    return ''
+  }
   let prefix = bottom ? BOX_BOTTOM_LEFT : BOX_INTERSECTION
   let spacing = []
   let spaceIndex = 0
@@ -89,7 +94,9 @@ function shouldBeIncluded(file) {
 function buildTree(directory, depth) {
   const files = fs.readdirSync(directory);
   const max_index = files.length - 1
-  const color = chalk[colors[depth % colors.length]]
+  const color = shouldIndent
+    ? chalk[colors[depth % colors.length]]
+    : chalk[colors[0]]
 
   for (let i = 0; i <= max_index; i++) {
     const file = files[i]
