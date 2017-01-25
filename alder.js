@@ -21,6 +21,7 @@ program.version('1.0.0')
   .option('-d, --depth <n>', 'Only render the tree to a specific depth', parseInt)
   .option('--prune', 'Prune empty directories from the output')
   .option('--filelimit <n>', 'Do not descend directories that contain more than # entries', parseInt)
+  .option('--jsx', 'Print directory structure as JSX')
   .parse(process.argv)
 
 /**
@@ -42,6 +43,7 @@ const showAllFiles = !!program.all
 const showModifiedDate = !!program.dateModified
 const showOnlyDirectories = !!program.directories
 const pruneEmptyDirectories = !!program.prune
+const printJSX = program.jsx
 const shouldIndent =  typeof program.indent === 'undefined' ? true : program.indent
 const hasExcludePattern = typeof program.exclude !== 'undefined'
 const hasIncludePattern = typeof program.include !== 'undefined'
@@ -79,10 +81,10 @@ function buildPrefix(depth, bottom) {
   let spacing = []
   let spaceIndex = 0
   while(spaceIndex < depth) {
-    spacing[spaceIndex] = depths[spaceIndex] ? BOX_VERTICAL : EMPTY
+    spacing[spaceIndex] = depths[spaceIndex] && !printJSX ? BOX_VERTICAL : EMPTY
     spaceIndex++
   }
-  return spacing.join('') + prefix
+  return printJSX ? spacing.join('') : spacing.join('') + prefix
 }
 
 /**
@@ -102,7 +104,18 @@ function shouldBeIncluded(file) {
     return includePattern.test(file)
   }
   return true
-} 
+}
+
+function createJSXTags(filename, isDirectory, size, fullPath) {
+  const tag = isDirectory ? 'dir' : 'file'
+  const empty = isDirectory && (fs.readdirSync(fullPath).length > 0)
+  return {
+    open: empty && (fs.readdirSync(fullPath).length > 0)
+      ? `<${tag} ${isDirectory ? '' : chalk.cyan("size=")}"${size}" ${chalk.cyan("name=")}"${filename}">`
+      : `<${tag} ${chalk.cyan("size=")}"${size}" ${chalk.cyan("name=")}"${filename}" />`,
+    close: empty ? `</${tag}>` : null
+  }
+}
 
 /**
  * Depth-first recursive traversal utility for
@@ -157,11 +170,21 @@ function buildTree(directory, depth) {
     }
 
     const filename = showFullPath ? color(fullPath.replace(cwd + '/', '')) : color(file)
+    const JSXTags = createJSXTags(filename, isDirectory, size, fullPath)
+
+    if (printJSX) {
+      output += prefix + JSXTags.open + '\n'
+    } else {
+      output += prefix + filename + (!isDirectory && showSize ? ` (${size})` : '') + postfix + '\n';
+    }
     if (printWithoutDescending) {
       continue
     }
     if (isDirectory && (depth + 1 < maxDepth)) {
       buildTree(path.resolve(directory, file), depth + 1)
+    }
+    if (printJSX && JSXTags.close) {
+      output += prefix + JSXTags.close + '\n'
     }
     --depths[depth]
   }
