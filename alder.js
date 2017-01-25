@@ -10,6 +10,7 @@ const program = require('commander')
 program.version('1.0.0')
   .arguments('[target]')
   .option('-i, --no-indent', 'Tree will not print the indentation lines', { isDefault: true })
+  .option('-a, --all', 'Print all files, including hidden files')
   .option('-f, --full', 'Print the full path prefix for each file')
   .option('-s, --sizes', 'Show file sizes in tree')
   .option('-e, --exclude <s>', 'Exclude files matching a pattern')
@@ -31,6 +32,7 @@ const root = path.resolve(cwd, input)
 const maxDepth = program.depth || Infinity 
 const showSize = program.sizes
 const showFullPath = !!program.full
+const showAllFiles = !!program.all
 const shouldIndent =  typeof program.indent === 'undefined' ? true : program.indent
 const hasExcludePattern = typeof program.exclude !== 'undefined'
 const hasIncludePattern = typeof program.include !== 'undefined'
@@ -80,6 +82,10 @@ function buildPrefix(depth, bottom) {
  * @param {String} file   filename
  */
 function shouldBeIncluded(file) {
+
+  if (!showAllFiles && file[0] === '.') {
+    return false
+  }
   if (hasExcludePattern) {
     return !excludePattern.test(file)
   }
