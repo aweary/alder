@@ -8,6 +8,7 @@ UNIX command.
 `alder` should be installed globally using `yarn` or `npm`.
 ```
 yarn global add @aweary/alder
+npm i -g ssh+git@github.com:aweary/alder.git
 ```
 
 ## Usage
