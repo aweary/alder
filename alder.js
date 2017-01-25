@@ -6,12 +6,14 @@ const path = require('path')
 const prettybytes = require('pretty-bytes')
 const chalk = require('chalk')
 const program = require('commander')
+const tinytime = require('tinytime')
 
 program.version('1.0.0')
   .arguments('[target]')
   .option('-i, --no-indent', 'Tree will not print the indentation lines', { isDefault: true })
   .option('-a, --all', 'Print all files, including hidden files')
   .option('-d, --directories', 'Only print directories')
+  .option('-D, --date-modified', 'Print the last modified date for each file')
   .option('-f, --full', 'Print the full path prefix for each file')
   .option('-s, --sizes', 'Show file sizes in tree')
   .option('-e, --exclude <s>', 'Exclude files matching a pattern')
@@ -34,12 +36,14 @@ const maxDepth = program.depth || Infinity
 const showSize = program.sizes
 const showFullPath = !!program.full
 const showAllFiles = !!program.all
+const showModifiedDate = !!program.dateModified
 const showOnlyDirectories = !!program.directories
 const shouldIndent =  typeof program.indent === 'undefined' ? true : program.indent
 const hasExcludePattern = typeof program.exclude !== 'undefined'
 const hasIncludePattern = typeof program.include !== 'undefined'
 const excludePattern = new RegExp(program.exclude)
 const includePattern = new RegExp(program.include)
+const dateTemplate = tinytime('[{MM} {DD} {h}:{mm}]  ', { padDays :true, padHours: true })
 
 if (hasExcludePattern && hasIncludePattern) {
   throw new Error('Exclude patterns and include patterns cannot be used together.')
@@ -111,10 +115,15 @@ function buildTree(directory, depth) {
     const file = files[i]
     depths[depth] = max_index - i
     const fullPath = path.resolve(directory, file)
-    const prefix = buildPrefix(depth, i === max_index, directory)
+    let postfix = ''
+    let prefix = buildPrefix(depth, i === max_index, directory)
     const stats = fs.statSync(fullPath)
     const isDirectory = stats.isDirectory()
     const size = prettybytes(stats.size)
+  
+    if (showModifiedDate) {
+      prefix += dateTemplate.render(new Date(stats.mtime))
+    }
 
     if (isDirectory) {
       directoryCount++
