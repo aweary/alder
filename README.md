@@ -5,9 +5,13 @@ UNIX command.
 ![Alder: the better tree printer](http://i.imgur.com/8qhaxvG.png)
 
 ## Installation
-`alder` should be installed globally using `yarn` or `npm`.
+`alder` should be installed globally using `yarn`.
 ```
 yarn global add @aweary/alder
+```
+or with `npm`:
+```
+npm install -g @aweary/alder
 ```
 
 ## Usage
