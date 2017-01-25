@@ -20,6 +20,7 @@ program.version('1.0.0')
   .option('-in, --include <s>', 'Include only files that match a pattern')
   .option('-d, --depth <n>', 'Only render the tree to a specific depth', parseInt)
   .option('--prune', 'Prune empty directories from the output')
+  .option('--filelimit <n>', 'Do not descend directories that contain more than # entries', parseInt)
   .parse(process.argv)
 
 /**
@@ -34,6 +35,7 @@ const input = program.args[0] || '.';
 const cwd = process.env.PWD;
 const root = path.resolve(cwd, input)
 const maxDepth = program.depth || Infinity 
+const fileLimit = program.filelimit || Infinity
 const showSize = program.sizes
 const showFullPath = !!program.full
 const showAllFiles = !!program.all
