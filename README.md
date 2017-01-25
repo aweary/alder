@@ -17,12 +17,20 @@ yarn global add @aweary/alder
 
   Options:
 
-    -h, --help         output usage information
-    -V, --version      output the version number
-    -s, --sizes        Show file sizes in tree
-    -e, --exclude <s>  Exclude files matching a pattern
-    -i, --include <s>  Include only files that match a pattern
-    -d, --depth <n>    Only render the tree to a specific depth
+    -h, --help           output usage information
+    -V, --version        output the version number
+    -a, --all            Print all files, including hidden files
+    -d, --directories    Only print directories
+    -D, --date-modified  Print the last modified date for each file
+    -i, --no-indent      Tree will not print the indentation lines
+    -f, --full           Print the full path prefix for each file
+    -s, --sizes          Show file sizes in tree
+    -e, --exclude <s>    Exclude files matching a pattern
+    -in, --include <s>   Include only files that match a pattern
+    -d, --depth <n>      Only render the tree to a specific depth
+    --prune              Prune empty directories from the output
+    --filelimit <n>      Do not descend directories that contain more than # entries
+    --jsx                Print directory structure as JSX
 ```
 
 ### Exclude pattern
