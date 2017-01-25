@@ -19,6 +19,7 @@ program.version('1.0.0')
   .option('-e, --exclude <s>', 'Exclude files matching a pattern')
   .option('-in, --include <s>', 'Include only files that match a pattern')
   .option('-d, --depth <n>', 'Only render the tree to a specific depth', parseInt)
+  .option('--prune', 'Prune empty directories from the output')
   .parse(process.argv)
 
 /**
@@ -38,6 +39,7 @@ const showFullPath = !!program.full
 const showAllFiles = !!program.all
 const showModifiedDate = !!program.dateModified
 const showOnlyDirectories = !!program.directories
+const pruneEmptyDirectories = !!program.prune
 const shouldIndent =  typeof program.indent === 'undefined' ? true : program.indent
 const hasExcludePattern = typeof program.exclude !== 'undefined'
 const hasIncludePattern = typeof program.include !== 'undefined'
@@ -107,14 +109,13 @@ function shouldBeIncluded(file) {
 function buildTree(directory, depth) {
   const files = fs.readdirSync(directory);
   const max_index = files.length - 1
-  const color = shouldIndent
-    ? chalk[colors[depth % colors.length]]
-    : chalk[colors[0]]
+  const color = chalk[colors[depth % colors.length]]
 
   for (let i = 0; i <= max_index; i++) {
     const file = files[i]
     depths[depth] = max_index - i
     const fullPath = path.resolve(directory, file)
+    let printWithoutDescending = false
     let postfix = ''
     let prefix = buildPrefix(depth, i === max_index, directory)
     const stats = fs.statSync(fullPath)
@@ -136,12 +137,27 @@ function buildTree(directory, depth) {
       continue
     }
 
-    const filename = showFullPath ? color(fullPath) : color(file)
-    output += prefix + filename + (!isDirectory && showSize ? ` (${size})` : '') + '\n';
     if (!isDirectory && showOnlyDirectories) {
       continue
     }
 
+    if (isDirectory) {
+      if (fileLimit !== Infinity || pruneEmptyDirectories) {
+        const dirfiles = fs.readdirSync(fullPath).filter(shouldBeIncluded)
+        if (pruneEmptyDirectories && dirfiles.length === 0) {
+          continue
+        }
+        if (dirfiles.length > fileLimit) {
+          printWithoutDescending = true
+          postfix = ` [${dirfiles.length} entries exceeds filelimit (${fileLimit}), not opening dir]`
+        }
+      }
+    }
+
+    const filename = showFullPath ? color(fullPath.replace(cwd + '/', '')) : color(file)
+    if (printWithoutDescending) {
+      continue
+    }
     if (isDirectory && (depth + 1 < maxDepth)) {
       buildTree(path.resolve(directory, file), depth + 1)
     }
