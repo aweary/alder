@@ -7,6 +7,7 @@ const prettybytes = require('pretty-bytes')
 const chalk = require('chalk')
 const program = require('commander')
 const tinytime = require('tinytime')
+const minimatch = require('minimatch')
 
 program.version('1.0.0')
   .arguments('[target]')
@@ -65,6 +66,31 @@ let directoryCount = 0
 let totalFileSize = 0
 
 /**
+ * If available, it reads the `.gitignore` file in the current
+ * directory and parses it into a list of glob patterns, removing
+ * empty lines and comments
+ */
+function readGitignore(directory) {
+  const gitignorePath = `${directory}/.gitignore`
+  try {
+    const gitignoreRaw = fs.readFileSync(gitignorePath, 'utf-8')
+    const gitignoreList = gitignoreRaw.split('\n')
+      .filter(function (line) {
+        return line !== '' && !line.startsWith('#')
+      })
+      .map(function (line) {
+        // lines such as `/node_modules` in `.gitignore` are not used
+        // the same way by minimatch. In order for the matching to work
+        // we need to remove the starting `/`
+        return line.startsWith('/') ? line.slice(1) : line
+      })
+    return gitignoreList
+  } catch (e) {
+    return []
+  }
+}
+
+/**
  * Pads filenames with either whitespace or box characters.
  * The depths map is used to track whether a character should
  * be whitespace or a vertical character. Typically it will
@@ -121,10 +147,11 @@ function createJSXTags(filename, isDirectory, size, fullPath) {
  * Depth-first recursive traversal utility for
  * building up the output string.
  */
-function buildTree(directory, depth) {
+function buildTree(directory, depth, parentGitignoreList = []) {
   const files = fs.readdirSync(directory);
   const max_index = files.length - 1
   const color = chalk[colors[depth % colors.length]]
+  const gitignoreList = parentGitignoreList.concat(readGitignore(directory))
 
   for (let i = 0; i <= max_index; i++) {
     const file = files[i]
@@ -149,6 +176,17 @@ function buildTree(directory, depth) {
     }
 
     if (!shouldBeIncluded(file)) {
+      continue
+    }
+
+    let matchesGitIgnoreEntry = false
+    let m = gitignoreList.length
+    while (!matchesGitIgnoreEntry && m > 0) {
+      matchesGitIgnoreEntry = minimatch(file, gitignoreList[m - 1])
+      m--
+    }
+
+    if (matchesGitIgnoreEntry) {
       continue
     }
 
@@ -181,7 +219,7 @@ function buildTree(directory, depth) {
       continue
     }
     if (isDirectory && (depth + 1 < maxDepth)) {
-      buildTree(path.resolve(directory, file), depth + 1)
+      buildTree(path.resolve(directory, file), depth + 1, gitignoreList)
     }
     if (printJSX && JSXTags.close) {
       output += prefix + JSXTags.close + '\n'
