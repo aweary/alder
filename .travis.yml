@@ -3,3 +3,6 @@ node_js:
   - "7"
   - "6"
   - "5"
+  cache:
+    directories:
+      - __tests__/__snapshots__
