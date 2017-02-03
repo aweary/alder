@@ -149,10 +149,11 @@ function createJSXTags(filename, isDirectory, size, fullPath) {
  * Depth-first recursive traversal utility for
  * building up the output string.
  */
-function buildTree(directory, depth, parentGitignoreList = []) {
+function buildTree(directory, depth, parentGitignoreList) {
   const files = fs.readdirSync(directory);
   const max_index = files.length - 1
   const color = chalk[colors[depth % colors.length]]
+  parentGitignoreList = parentGitignoreList || []
   const gitignoreList = hideFilesInGitIgnore
     ? parentGitignoreList.concat(readGitignore(directory))
     : []
@@ -183,7 +184,7 @@ function buildTree(directory, depth, parentGitignoreList = []) {
       continue
     }
 
-    if (hideFilesInGitIgnore) {      
+    if (hideFilesInGitIgnore) {
       let matchesGitIgnoreEntry = false
       let m = gitignoreList.length
       while (!matchesGitIgnoreEntry && m > 0) {
