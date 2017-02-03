@@ -15,6 +15,7 @@ program.version('1.0.0')
   .option('-d, --directories', 'Only print directories')
   .option('-D, --date-modified', 'Print the last modified date for each file')
   .option('-i, --no-indent', 'Tree will not print the indentation lines')
+  .option('-I, --git-ignore', 'Exclude files in .gitignore')
   .option('-f, --full', 'Print the full path prefix for each file')
   .option('-s, --sizes', 'Show file sizes in tree')
   .option('-e, --exclude <s>', 'Exclude files matching a pattern')
@@ -36,13 +37,14 @@ const EMPTY = '    '
 const input = program.args[0] || '.';
 const cwd = process.env.PWD;
 const root = path.resolve(cwd, input)
-const maxDepth = program.depth || Infinity 
+const maxDepth = program.depth || Infinity
 const fileLimit = program.filelimit || Infinity
 const showSize = program.sizes
 const showFullPath = !!program.full
 const showAllFiles = !!program.all
 const showModifiedDate = !!program.dateModified
 const showOnlyDirectories = !!program.directories
+const hideFilesInGitIgnore = !!program.gitIgnore
 const pruneEmptyDirectories = !!program.prune
 const printJSX = program.jsx
 const shouldIndent =  typeof program.indent === 'undefined' ? true : program.indent
@@ -151,7 +153,9 @@ function buildTree(directory, depth, parentGitignoreList = []) {
   const files = fs.readdirSync(directory);
   const max_index = files.length - 1
   const color = chalk[colors[depth % colors.length]]
-  const gitignoreList = parentGitignoreList.concat(readGitignore(directory))
+  const gitignoreList = hideFilesInGitIgnore
+    ? parentGitignoreList.concat(readGitignore(directory))
+    : []
 
   for (let i = 0; i <= max_index; i++) {
     const file = files[i]
@@ -163,7 +167,7 @@ function buildTree(directory, depth, parentGitignoreList = []) {
     const stats = fs.statSync(fullPath)
     const isDirectory = stats.isDirectory()
     const size = prettybytes(stats.size)
-  
+
     if (showModifiedDate) {
       prefix += dateTemplate.render(new Date(stats.mtime))
     }
@@ -179,15 +183,17 @@ function buildTree(directory, depth, parentGitignoreList = []) {
       continue
     }
 
-    let matchesGitIgnoreEntry = false
-    let m = gitignoreList.length
-    while (!matchesGitIgnoreEntry && m > 0) {
-      matchesGitIgnoreEntry = minimatch(file, gitignoreList[m - 1])
-      m--
-    }
+    if (hideFilesInGitIgnore) {      
+      let matchesGitIgnoreEntry = false
+      let m = gitignoreList.length
+      while (!matchesGitIgnoreEntry && m > 0) {
+        matchesGitIgnoreEntry = minimatch(file, gitignoreList[m - 1])
+        m--
+      }
 
-    if (matchesGitIgnoreEntry) {
-      continue
+      if (matchesGitIgnoreEntry) {
+        continue
+      }
     }
 
     if (!isDirectory && showOnlyDirectories) {
