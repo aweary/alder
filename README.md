@@ -27,6 +27,7 @@ npm install -g @aweary/alder
     -d, --directories    Only print directories
     -D, --date-modified  Print the last modified date for each file
     -i, --no-indent      Tree will not print the indentation lines
+    -I, --git-ignore     Exclude files in .gitignore
     -f, --full           Print the full path prefix for each file
     -s, --sizes          Show file sizes in tree
     -e, --exclude <s>    Exclude files matching a pattern

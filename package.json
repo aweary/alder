@@ -24,6 +24,7 @@
   "dependencies": {
     "chalk": "^1.1.3",
     "commander": "^2.9.0",
+    "minimatch": "^3.0.3",
     "pretty-bytes": "^4.0.2",
     "tinytime": "^0.2.0"
   },
