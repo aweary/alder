@@ -9,7 +9,7 @@ const program = require('commander')
 const tinytime = require('tinytime')
 const minimatch = require('minimatch')
 
-program.version('1.0.0')
+program.version('2.0.0')
   .arguments('[target]')
   .option('-a, --all', 'Print all files, including hidden files')
   .option('-d, --depth <n>', 'Only render the tree to a specific depth', parseInt)
