@@ -10,7 +10,7 @@ const execute = (args, cb) => {
       throw err
     }
     expect(stdout).toMatchSnapshot()
-    cb()
+    typeof cb !== 'undefined' && cb()
   })
 }
 
@@ -20,11 +20,11 @@ describe('alder', () => {
   })
 
   it(`only renders the tree to a depth of 1`, (done) => {
-    execute(`--depth 1`, done) && execute(` -d 1`, done)
+    execute(`--depth 1`, done) && execute(`-d 1`, done)
   })
 
   it(`only prints directories`, (done) => {
-    execute(`-D`, done) && execute(` --directories`, done)
+    execute(`-D`, done) && execute(`--directories`, done)
   })
 
   it(`excludes files matching pattern (bar)`, (done) => {
@@ -36,23 +36,23 @@ describe('alder', () => {
   })
 
   it(`will not print indentation lines`, (done) => {
-    execute(`-i`, done) && execute(`--no-indent`)
+    execute(`-i`, done) && execute(`--no-indent`, done)
   })
 
   it(`ignores files listed in .gitignore (foo folder)`, (done) => {
-    execute(`-I`, done) && execute(` --git-ignore`, done)
+    execute(`-I`, done) && execute(`--git-ignore`, done)
   })
 
   it(`will only show files matching pattern (foo)`, (done) => {
-    execute(`-p foo`, done) && execute(`--include foo`)
+    execute(`-p foo`, done) && execute(`--include foo`, done)
   })
 
   it(`shows file size in tree`, (done) => {
-    execute(`-s`, done) && execute(`--sizes`)
+    execute(`-s`, done) && execute(`--sizes`, done)
   })
 
   it(`prints the last modified date for each file`, (done) => {
-    execute(`-t`, done) && execute(` --time-stamp`, done)
+    execute(`-t`, done) && execute(`--time-stamp`, done)
   })
 
   it(`prunes empty directories from output`, (done) => {
