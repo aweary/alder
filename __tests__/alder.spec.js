@@ -14,18 +14,20 @@ describe('alder', () => {
   [
     '',
     '-a',
-    '-d',
-    '-i',
-    '-f',
-    '-s',
+    '-d 1',
+    '-D',
     '-e bar',
+    '-f',
+    '-i',
+    '-I',
     '-p bar',
-    '-d',
+    '-s',
+    '-t',
     '--prune',
     '--filelimit=3',
     '--jsx'
   ].map(flag => {
-    it(`works with the ${flag} flag`, (done) => {
+    it(`works with the '${flag}' flag`, (done) => {
       execute(`fixtures ${flag}`, done)
     })
   })
