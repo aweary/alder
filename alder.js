@@ -12,15 +12,15 @@ const minimatch = require('minimatch')
 program.version('1.0.0')
   .arguments('[target]')
   .option('-a, --all', 'Print all files, including hidden files')
-  .option('-d, --directories', 'Only print directories')
-  .option('-D, --date-modified', 'Print the last modified date for each file')
+  .option('-d, --depth <n>', 'Only render the tree to a specific depth', parseInt)
+  .option('-D, --directories', 'Only print directories')
+  .option('-e, --exclude <s>', 'Exclude files matching a pattern')
+  .option('-f, --full', 'Print the full path prefix for each file')
   .option('-i, --no-indent', 'Tree will not print the indentation lines')
   .option('-I, --git-ignore', 'Exclude files in .gitignore')
-  .option('-f, --full', 'Print the full path prefix for each file')
-  .option('-s, --sizes', 'Show file sizes in tree')
-  .option('-e, --exclude <s>', 'Exclude files matching a pattern')
   .option('-p, --include <s>', 'Pattern to include only files that match a pattern')
-  .option('-d, --depth <n>', 'Only render the tree to a specific depth', parseInt)
+  .option('-s, --sizes', 'Show file sizes in tree')
+  .option('-t, --time-stamp', 'Print the last modified date for each file')
   .option('--prune', 'Prune empty directories from the output')
   .option('--filelimit <n>', 'Do not descend directories that contain more than # entries', parseInt)
   .option('--jsx', 'Print directory structure as JSX')
@@ -42,7 +42,7 @@ const fileLimit = program.filelimit || Infinity
 const showSize = program.sizes
 const showFullPath = !!program.full
 const showAllFiles = !!program.all
-const showModifiedDate = !!program.dateModified
+const showTimeStamp = !!program.timeStamp
 const showOnlyDirectories = !!program.directories
 const hideFilesInGitIgnore = !!program.gitIgnore
 const pruneEmptyDirectories = !!program.prune
@@ -169,7 +169,7 @@ function buildTree(directory, depth, parentGitignoreList) {
     const isDirectory = stats.isDirectory()
     const size = prettybytes(stats.size)
 
-    if (showModifiedDate) {
+    if (showTimeStamp) {
       prefix += dateTemplate.render(new Date(stats.mtime))
     }
 

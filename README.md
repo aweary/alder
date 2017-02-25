@@ -22,17 +22,17 @@ npm install -g @aweary/alder
   Options:
 
     -h, --help           output usage information
-    -V, --version        output the version number
     -a, --all            Print all files, including hidden files
-    -d, --directories    Only print directories
-    -D, --date-modified  Print the last modified date for each file
+    -d, --depth <n>      Only render the tree to a specific depth
+    -D, --directories    Only print directories
+    -e, --exclude <s>    Exclude files matching a pattern
+    -f, --full           Print the full path prefix for each file
     -i, --no-indent      Tree will not print the indentation lines
     -I, --git-ignore     Exclude files in .gitignore
-    -f, --full           Print the full path prefix for each file
+    -p, --include <s>    Include only files that match a pattern
     -s, --sizes          Show file sizes in tree
-    -e, --exclude <s>    Exclude files matching a pattern
-    -in, --include <s>   Include only files that match a pattern
-    -d, --depth <n>      Only render the tree to a specific depth
+    -t, --time-stamp     Print the last modified date for each file
+    -V, --version        output the version number
     --prune              Prune empty directories from the output
     --filelimit <n>      Do not descend directories that contain more than # entries
     --jsx                Print directory structure as JSX
