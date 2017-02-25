@@ -29,7 +29,7 @@ npm install -g @aweary/alder
     -f, --full           Print the full path prefix for each file
     -i, --no-indent      Tree will not print the indentation lines
     -I, --git-ignore     Exclude files in .gitignore
-    -p, --include <s>   Include only files that match a pattern
+    -p, --include <s>    Include only files that match a pattern
     -s, --sizes          Show file sizes in tree
     -t, --time-stamp     Print the last modified date for each file
     -V, --version        output the version number
